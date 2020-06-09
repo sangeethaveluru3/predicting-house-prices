@@ -3,10 +3,12 @@
 This project was undertaken from the perspective of a real estate company, interested in using data science to predict residential house prices based on fixed characteristics, such as square footage, as well as analysing the cost effectiveess of doing renovations, such as exterior house finishing, in order to identify houses that would return a profit. The `predicting_house_prices` notebook walks through the whole process in detail.
 
 ## Table of Contents:
-### [Data](#Data)  
-### [Part 1 - Predict residential house prices based on fixed characteristics](#part1)
-### [Part 2 - Evaluating cost-effectiveness of renovations](#part1)
-### [Conclusion](#conclusion)
+- [Data](#Data)  
+- [Part 1 - Predict residential house prices based on fixed characteristics](#part1)
+- [Part 2 - Evaluating cost-effectiveness of renovations](#part2)
+- [Conclusion](#conclusion)
+
+---
 
 
 <a name="Data"/>
