@@ -1,58 +1,86 @@
-# ![](https://ga-dash.s3.amazonaws.com/production/assets/logo-9f88ae6c9c3871690e33280fcf557f33.png) Project 3
-# Regression and classification with housing data
+# Predicting House Prices
 
-## Business Case
+This project was undertaken from the perspective of a real estate company, interested in using data science to predict residential house prices based on fixed characteristics, such as square footage, as well as analysing the cost effectiveess of doing renovations, such as exterior house finishing, in order to identify houses that would return a profit. The `predicting_house_prices` notebook walks through the whole process in detail.
 
-You work for a real estate company interested in using data science to determine the best properties to buy and re-sell. Specifically, your company would like to identify the characteristics of residential houses that estimate the sale price and the cost-effectiveness of doing renovations.
 
-There are three components to the project:
+## Data
 
-1. Estimate the sale price of properties based on their "fixed" characteristics, such as neighborhood, lot size, number of stories, etc.
-2. Estimate the value of possible changes and renovations to properties from the variation in sale price not explained by the fixed characteristics. Your goal is to estimate the potential return on investment (and how much you should be willing to pay contractors) when making specific improvements to properties.
-3. Determine the features in the housing data that best predict "abnormal" sales (forclosures, etc.).
+The project uses the [Ames housing data recently made available on kaggle](https://www.kaggle.com/c/house-prices-advanced-regression-techniques). The `housing.csv` file contains the data and the full description of all of the features are detailed in `data_description.txt`.
 
-This project uses the [Ames housing data recently made available on kaggle](https://www.kaggle.com/c/house-prices-advanced-regression-techniques).
+## Part 1 
 
----
+The first part of the project develop a model to reliably estimate the value of residential houses based on fixed characteristics such as square footage, bedrooms and so on. Characteristics that are renovatable are generally those that can be modified without having to undergo major construction on the house. For example, roof and exterior features, "Quality" metrics (kitchen quality) and so on. 
 
-## Directions
+### Data Cleaning
 
-Though the housing data for this project is very rich, it is not trivial to clean and prepare for modeling. Good EDA, cleaning, and feature engineering will be critical to the success of your models. Always remember to think critically about the data before modeling. The computer can't be the researcher for you!
+- I firstly removed all of the columns that had 90% of the same values, including null values, as these columns would provide very little distinguishing information to predict house prices accurately. 
+- After dealing with some incorrect entries, I filled in the null values in the remaining columns in numerous ways, depending on the context. 
+    - For example, there were 259 entries with no linear feet of street connected to the property. Since properties would need to have some sort of street access, I filled them in the median value (vs mean due to skew) based on the type of property it was. 
 
-The first two parts of the project are regression problems. There are potentially hundreds of features and plenty of multicollinearity, so regularization is definitely recommended.
+### EDA & Feature Engineering 
 
-The second question involves fitting a regression on the residuals of the first model. This is a practice that "covaries out" any effects of the predictors in the first model before investigating the effects of predictors in the second model.
+I experimented with quite a few techniques here in order create better features and improve the score. For example: 
+-  I plotted some of the numerical categorical variables to look for any non-linear relationships. For example, factorizing and then squaring Basement Exposure improved the score as getting a rating of 'Gd' was worth more than an increment of 1 vs a score of 'Av'. 
+- Combining the square footage for basement, ground floor living area, 1st and 2nd floor to form 'total_sqft' as a seperate column and dropping the individual columns improved the score.
 
-The third section of the project is more challenging and involves dealing with significant class imbalance. This is a common and tricky problem in real-world classification tasks. We leave it up to you to decide how you want to tackle this problem and devise a solution, and highly recommend doing your own research into the topic.
 
-We will be looking for the following things:
+### Modelling
 
-- Detailed EDA with justification for the steps. Visualize your data with pandas, matplotlib, or other plotting libraries. Explain the variables you choose for your models.
-- Detail your choice of regression and classification models for the task. Include Markdown explaining your justification, results, and interpretation of your models. Make sure your code is clean and clear.
-- Remember to frame your results according to your goals outlined in the project prompts.
+I tried Multiple Linear Regression with no regularisation, Lasso, Ridge and ElasticNet regularisation and compared them using the mean cross-validated (folds=5) R2 scores. Given the number of features and plenty of multicollinearity, regularisation was definitely needed as reflected in the scores.
 
----
+After finding the optimal alpha value, I optimised Lasso and Ridge further by iteratively removed coefficients below a range of thresholds, refit the models and documented the change in score. This helped boost the score even further as for the Ridge model, it helped to boost the score by ~0.009 after dropping 62 columns that were below the optimal threshold 0.006221. 
 
-## Requirements
+![](images/ridge1_cvlineplot.png)
 
-- Materials must be in a clearly commented Jupyter notebook
-- You should demonstrate the ability to:
 
-1. Analyze a complex dataset & explicitly state your assumptions.
-2. Clean, impute, and explore the dataset.
-3. Justify your modeling choices and feature engineering.
-4. Plot, visualize, and interpret your data logically.
-5. Clearly outline your modeling strategy in response to the questions
-6. Explain your results to a technical audience.
+#### Models and R2 scores:
 
----
+- Linear regression, no regularisation: -2.681963e+23
+- Lasso: 0.856770
+- Ridge (the best model): 0.857827
+- ElasticNet: 0.847308
 
-## Project Feedback + Evaluation
+#### Visualising the coefficients for the best Ridge model:
 
-For all projects, students will be evaluated on a simple 3 point scale (0, 1, or 2). Instructors will use this rubric when scoring student performance on each of the core project **requirements:**
+![](images/ridge1_coeff.png)
 
-Score | Expectations
------ | ------------
-**0** | _Incomplete_
-**1** | _Does not meet expectations_
-**2** | _Meets expectations, good job!_
+In order to improve the score, I decided to take the log of Sale Price to reduce the skew and ensure a normal distribution. This model is therefore a log-linear regression model, giving us the equation ![](https://latex.codecogs.com/gif.latex?ln%28Y%29%20%3D%20%5Cbeta_0%20&plus;%20%5Cbeta_1%20X_1%20&plus;...&plus;%20%5Cbeta_n%20X_n):
+
+$$ln(Y) = \beta_0 + \beta_1 X_1 +...+ \beta_n X_n$$
+
+So the way to interpret the coefficients is that for each standard deviation rise in $X_i$, the value of $Y$ increase by $e^{\beta_i}$. For example, in the Ridge model (as shown in the picture), total_sqt had a coefficient of ~0.09. $e^{0.09} = ~1.094$. Meaning 1 std rise in total_sqt causes the sale price to multiply by ~1.094 or increase by ~9.41%. In all the optimal model coefficient visualisation plots, the coefficients have altered to represent the percentage impact on the price.
+
+
+## Part 2 
+
+The second part of the brief involved accessing the cost-effectiveness of renovatable features. One way of doing this would be to use the residuals from the previous model (error terms) and predict to what extent the renovatable features we discarded at the top can explain the discrepancies in the estimates vs the actual prices. The steps taken in cleaning, EDA, feature engineering and modelling mirror the proccess in part 1. 
+
+### Modelling 
+
+After optimising for alpha and the best coefficient cut-off threshold, Ridge was again marginally better than the other models. 
+
+#### Models and R2 scores:
+
+- Linear regression, no regularisation: -1.402297e+25
+- Lasso: 0.189700
+- Ridge (the best model): 0.198993
+- ElasticNet: 0.143133
+
+#### Visualising the coefficients for the best Ridge model:
+
+![](images/ridge2_coeff.png)
+
+From visualising the largest coefficients, we can see that the Overall Condition rating (accounts for ~20% increase in the part of the price accountable for renovatable features for 1 std rise in the rating) and having a brickface exterior finishing seem to contribute positively to explain the discrepancies in price for the estimated vs actual house prices. 
+
+Given the context, it would be safe to assume that they contribute positively to overall house price and hence would be wise to renovate and upgrade the finishing of the home (as cost effectively as possible) to increase the rating of house (Condition or Quality metrics) to improve the sale price. However, given the low R2 score, more work may needs to done before we can put any weight on the findings of the second model.
+
+## Conclusion
+
+The first model was able to predict the price of residential houses reasonably well using the fixed characteristics, with a R2 score of 0.857827 using Ridge regularisation. Visualising the coefficients didn't reveal anything surprisingly, with the biggest positive influences on priceswhere the total square footage of the home, number of fireplaces, certan neighbourhoods and so on. 
+
+In the second part, using residuals to estimate how much the renovatable features had an impact on price, the results were not great with the best R2 score at 0.198993. This low R2 score is not surprising as we are trying to estimate the residuals from an imperfect model where the residuals will have an element of irreducible amount of error which we cannot predict without overfitting.
+
+A more accurate way of determining which renovatable features would play the biggest role in boosting the price and hence are cost-effective to carry out, would be to include them with the fixed characteristics in the first model, using regularisation to strip out the multi-collinearity issues, and hence be able assess with more confidence (in terms of R2 score) the percentage impact they would have on the property price.
+
+
+
