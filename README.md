@@ -44,9 +44,9 @@ After finding the optimal alpha value, I optimised Lasso and Ridge further by it
 
 ![](images/ridge1_coeff.png)
 
-In order to improve the score, I decided to take the log of Sale Price to reduce the skew and ensure a normal distribution. This model is therefore a log-linear regression model, giving us the equation ![](https://latex.codecogs.com/gif.latex?ln%28Y%29%20%3D%20%5Cbeta_0%20&plus;%20%5Cbeta_1%20X_1%20&plus;...&plus;%20%5Cbeta_n%20X_n):
+In order to improve the score, I decided to take the log of Sale Price to reduce the skew and ensure a normal distribution. This model is therefore a log-linear regression model, giving us the equation:
 
-$$ln(Y) = \beta_0 + \beta_1 X_1 +...+ \beta_n X_n$$
+![](https://latex.codecogs.com/gif.latex?ln%28Y%29%20%3D%20%5Cbeta_0%20&plus;%20%5Cbeta_1%20X_1%20&plus;...&plus;%20%5Cbeta_n%20X_n)
 
 So the way to interpret the coefficients is that for each standard deviation rise in $X_i$, the value of $Y$ increase by $e^{\beta_i}$. For example, in the Ridge model (as shown in the picture), total_sqt had a coefficient of ~0.09. $e^{0.09} = ~1.094$. Meaning 1 std rise in total_sqt causes the sale price to multiply by ~1.094 or increase by ~9.41%. In all the optimal model coefficient visualisation plots, the coefficients have altered to represent the percentage impact on the price.
 
