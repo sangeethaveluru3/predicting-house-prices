@@ -9,11 +9,13 @@ This project was undertaken from the perspective of a real estate company, inter
 - #### [Conclusion](#conclusion)
 
 <a name="Data"/>
+
 ## Data
 
 The project uses the [Ames housing data recently made available on kaggle](https://www.kaggle.com/c/house-prices-advanced-regression-techniques). The `housing.csv` file contains the data and the full description of all of the features are detailed in `data_description.txt`.
 
 <a name="part1"/>
+
 ## Part 1 
 
 The first part of the project develop a model to reliably estimate the value of residential houses based on fixed characteristics such as square footage, bedrooms and so on. Characteristics that are renovatable are generally those that can be modified without having to undergo major construction on the house. For example, roof and exterior features, "Quality" metrics (kitchen quality) and so on. 
