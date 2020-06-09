@@ -2,11 +2,18 @@
 
 This project was undertaken from the perspective of a real estate company, interested in using data science to predict residential house prices based on fixed characteristics, such as square footage, as well as analysing the cost effectiveess of doing renovations, such as exterior house finishing, in order to identify houses that would return a profit. The `predicting_house_prices` notebook walks through the whole process in detail.
 
+## Table of Contents:
+- #### [Data](#Data)  
+- #### [Part 1 - Predict residential house prices based on fixed characteristics](#part1)
+- #### [Part 2 - Evaluating cost-effectiveness of renovations](#part1)
+- #### [Conclusion](#conclusion)
 
+<a name="Data"/>
 ## Data
 
 The project uses the [Ames housing data recently made available on kaggle](https://www.kaggle.com/c/house-prices-advanced-regression-techniques). The `housing.csv` file contains the data and the full description of all of the features are detailed in `data_description.txt`.
 
+<a name="part1"/>
 ## Part 1 
 
 The first part of the project develop a model to reliably estimate the value of residential houses based on fixed characteristics such as square footage, bedrooms and so on. Characteristics that are renovatable are generally those that can be modified without having to undergo major construction on the house. For example, roof and exterior features, "Quality" metrics (kitchen quality) and so on. 
@@ -50,7 +57,7 @@ In order to improve the score, I decided to take the log of Sale Price to reduce
 
 So the way to interpret the coefficients is that for each standard deviation rise in $X_i$, the value of $Y$ increase by $e^{\beta_i}$. For example, in the Ridge model (as shown in the picture), total_sqt had a coefficient of ~0.09. $e^{0.09} = ~1.094$. Meaning 1 std rise in total_sqt causes the sale price to multiply by ~1.094 or increase by ~9.41%. In all the optimal model coefficient visualisation plots, the coefficients have altered to represent the percentage impact on the price.
 
-
+<a name="part2"/>
 ## Part 2 
 
 The second part of the brief involved accessing the cost-effectiveness of renovatable features. One way of doing this would be to use the residuals from the previous model (error terms) and predict to what extent the renovatable features we discarded at the top can explain the discrepancies in the estimates vs the actual prices. The steps taken in cleaning, EDA, feature engineering and modelling mirror the proccess in part 1. 
@@ -74,6 +81,7 @@ From visualising the largest coefficients, we can see that the Overall Condition
 
 Given the context, it would be safe to assume that they contribute positively to overall house price and hence would be wise to renovate and upgrade the finishing of the home (as cost effectively as possible) to increase the rating of house (Condition or Quality metrics) to improve the sale price. However, given the low R2 score, more work may needs to done before we can put any weight on the findings of the second model.
 
+<a name="conclusion"/>
 ## Conclusion
 
 The first model was able to predict the price of residential houses reasonably well using the fixed characteristics, with a R2 score of 0.857827 using Ridge regularisation. Visualising the coefficients didn't reveal anything surprisingly, with the biggest positive influences on priceswhere the total square footage of the home, number of fireplaces, certan neighbourhoods and so on. 
